@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.support.CorrelationData;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFutureCallback;
@@ -15,15 +16,15 @@ import java.util.UUID;
 import static com.example.ProducerConfig.FIBO_CALCULATOR_EXCHANGE_NAME;
 import static com.example.ProducerConfig.FIBO_CALCULATOR_ROUTING_KEY_NAME;
 
-/**
- * @author Zoltan Altfatter
- */
+
 @Component
 @Slf4j
 public class Producer {
 
+
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
     public Producer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
