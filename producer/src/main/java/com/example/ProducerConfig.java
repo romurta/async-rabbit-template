@@ -5,10 +5,13 @@ import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.support.CorrelationData;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @author Zoltan Altfatter
@@ -28,6 +31,11 @@ public class ProducerConfig {
     private ConnectionFactory connectionFactory;
 
 
+    @PostConstruct
+    public void postConstructor(){
+        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> System.out.println(correlationData + " - " + ack));
+    }
+
     @Bean
     DirectExchange exchange() {
         return new DirectExchange(FIBO_CALCULATOR_EXCHANGE_NAME);
@@ -36,11 +44,6 @@ public class ProducerConfig {
     @Bean
     Queue requestQueue() {
         return QueueBuilder.durable(FIBO_CALCULATOR_REQUEST_QUEUE_NAME).build();
-    }
-
-    @Bean
-    Queue replyQueue() {
-        return QueueBuilder.durable(FIBO_CALCULATOR_REPLY_QUEUE_NAME).build();
     }
 
     @Bean
@@ -53,11 +56,5 @@ public class ProducerConfig {
         return new Jackson2JsonMessageConverter();
     }
 
-    @Bean
-    AsyncRabbitTemplate template() {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
-        container.setQueueNames(FIBO_CALCULATOR_REPLY_QUEUE_NAME);
-        return new AsyncRabbitTemplate(rabbitTemplate, container);
-    }
 
 }

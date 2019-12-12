@@ -2,12 +2,15 @@ package com.example;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.support.CorrelationData;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import java.util.Date;
 import java.util.Random;
+import java.util.UUID;
 
 import static com.example.ProducerConfig.FIBO_CALCULATOR_EXCHANGE_NAME;
 import static com.example.ProducerConfig.FIBO_CALCULATOR_ROUTING_KEY_NAME;
@@ -19,10 +22,10 @@ import static com.example.ProducerConfig.FIBO_CALCULATOR_ROUTING_KEY_NAME;
 @Slf4j
 public class Producer {
 
-    private AsyncRabbitTemplate asyncRabbitTemplate;
+    private RabbitTemplate rabbitTemplate;
 
-    public Producer(AsyncRabbitTemplate asyncRabbitTemplate) {
-        this.asyncRabbitTemplate = asyncRabbitTemplate;
+    public Producer(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Scheduled(fixedDelay = 1000L)
@@ -31,21 +34,10 @@ public class Producer {
 
         FiboCalcRequest request = new FiboCalcRequest(number);
 
-        AsyncRabbitTemplate.RabbitConverterFuture<FiboCalcResponse> future =
-                asyncRabbitTemplate.convertSendAndReceive(FIBO_CALCULATOR_EXCHANGE_NAME, FIBO_CALCULATOR_ROUTING_KEY_NAME, request);
+        CorrelationData correlationData = new CorrelationData("THIAGO"+UUID.randomUUID().toString());
+
+        rabbitTemplate.convertAndSend(FIBO_CALCULATOR_EXCHANGE_NAME, FIBO_CALCULATOR_ROUTING_KEY_NAME, request, correlationData);
         log.info("Thread: '{}' calc fibonacci for number '{}'", Thread.currentThread().getName(), number);
-
-        future.addCallback(new ListenableFutureCallback<FiboCalcResponse>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                throwable.printStackTrace();
-            }
-
-            @Override
-            public void onSuccess(FiboCalcResponse result) {
-                log.info("Thread: '{}' result: '{}'", Thread.currentThread().getName(), result);
-            }
-        });
 
     }
 
