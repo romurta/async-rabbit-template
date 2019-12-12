@@ -15,7 +15,7 @@ public class Consumer {
 
     @RabbitListener(queues = ConsumerConfig.FIBO_CALCULATOR_REQUEST_QUEUE_NAME)
     public FiboCalcResponse process(@Payload FiboCalcRequest request) throws InterruptedException {
-        Thread.sleep(1500);
+        Thread.sleep(100);
         log.info("Received '{}'", request.getNumber());
         return new FiboCalcResponse(request.getNumber(), fibo(request.getNumber()));
     }

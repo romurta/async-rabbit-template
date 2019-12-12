@@ -1,0 +1,9 @@
+logging:
+  level:
+    org:
+      springframework:
+        amqp:
+          rabbit: DEBUG
+spring:
+  rabbitmq:
+    publisher-confirms: true

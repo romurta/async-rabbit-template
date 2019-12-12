@@ -16,7 +16,7 @@ public class ConsumerConfig {
 
     @Bean
     Queue requestQueue() {
-        return QueueBuilder.durable(FIBO_CALCULATOR_REQUEST_QUEUE_NAME ).build();
+        return QueueBuilder.durable( FIBO_CALCULATOR_REQUEST_QUEUE_NAME ).build();
     }
 
     @Bean

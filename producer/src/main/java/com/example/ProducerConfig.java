@@ -57,7 +57,11 @@ public class ProducerConfig {
     AsyncRabbitTemplate template() {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
         container.setQueueNames(FIBO_CALCULATOR_REPLY_QUEUE_NAME);
-        return new AsyncRabbitTemplate(rabbitTemplate, container);
+//        rabbitTemplate.setReplyAddress("30000");
+
+        AsyncRabbitTemplate asyncRabbitTemplate = new AsyncRabbitTemplate(rabbitTemplate, container);
+        asyncRabbitTemplate.setEnableConfirms(true);
+        return asyncRabbitTemplate;
     }
 
 }
